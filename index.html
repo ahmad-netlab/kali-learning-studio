@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kali Linux Learning Studio</title>
+
+<style>
+:root {
+  --bg: #10141c;
+  --panel: #1b2330;
+  --text: #f1f5f9;
+  --muted: #aab6c5;
+  --green: #8cffb2;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px Arial, sans-serif;
+}
+header {
+  padding: 28px 7%;
+  background: #18212b;
+  border-bottom: 1px solid #35404d;
+}
+header h1 { margin: 0 0 8px; }
+header p { color: var(--muted); margin: 0; }
+main { max-width: 1000px; margin: auto; padding: 28px 5%; }
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.stat, .lesson, .record {
+  background: var(--panel);
+  border: 1px solid #35404d;
+  border-radius: 12px;
+  padding: 18px;
+}
+.stat { flex: 1; min-width: 180px; }
+.stat strong { display: block; font-size: 26px; color: var(--green); }
+.lesson { margin: 12px 0; }
+.lesson h3 { margin-top: 0; }
+.lesson p, .record p { color: var(--muted); line-height: 1.5; }
+button, a.button {
+  display: inline-block;
+  border: 0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  background: var(--green);
+  color: #102018;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  margin: 5px 5px 5px 0;
+}
+input[type="checkbox"] { transform: scale(1.2); margin-right: 8px; }
+.links { display: flex; flex-wrap: wrap; gap: 8px; }
+footer { padding: 25px; text-align: center; color: var(--muted); }
+</style>
+</head>
+
+<body>
+<header>
+  <h1> Kali Linux Learning Studio</h1>
+  <p>Learn Linux · Practice · Record · Publish</p>
+</header>
+
+<main>
+  <section class="stats">
+    <div class="stat">
+      <strong id="progress">0%</strong>
+      Course progress
+    </div>
+    <div class="stat">
+      <strong id="completed">0 / 5</strong>
+      Lessons completed
+    </div>
+  </section>
+
+  <h2>My Learning Path</h2>
+  <div id="lessons"></div>
+
+  <h2>Recording Studio</h2>
+  <section class="record">
+    <h3>Record your Kali Linux lesson</h3>
+    <p>
+      Open VMware and OBS Studio on your Windows PC.
+      Select the VMware window as your recording source.
+      Add your microphone, then start recording.
+    </p>
+    <a class="button" href="https://obsproject.com/"
+       target="_blank" rel="noopener">
+       Get OBS Studio
+    </a>
+    <a class="button" href="https://www.capcut.com/"
+       target="_blank" rel="noopener">
+       Edit with CapCut
+    </a>
+  </section>
+
+  <h2>Publish Your Videos</h2>
+  <section class="record">
+    <p>Choose a platform to upload your finished video.</p>
+    <div class="links">
+      <a class="button" href="https://studio.youtube.com/"
+         target="_blank" rel="noopener">YouTube Studio</a>
+      <a class="button" href="https://www.tiktok.com/upload"
+         target="_blank" rel="noopener">TikTok</a>
+      <a class="button" href="https://www.instagram.com/"
+         target="_blank" rel="noopener">Instagram</a>
+      <a class="button" href="https://www.facebook.com/"
+         target="_blank" rel="noopener">Facebook</a>
+    </div>
+  </section>
+</main>
+
+<footer>Kali Linux Learning Studio · Personal learning project</footer>
+
+<script>
+const course = [
+  {
+    title: "01 - Introduction to Kali Linux",
+    description: "Understand Kali Linux, VMware and the desktop.",
+    task: "Open Kali Linux and explore the desktop."
+  },
+  {
+    title: "02 - Basic Linux Commands",
+    description: "Learn whoami, pwd, ls and hostname.",
+    task: "Open Terminal and practice these commands."
+  },
+  {
+    title: "03 - Networking Basics",
+    description: "Understand IP addresses and network interfaces.",
+    task: "Practice ip addr and ping in your own VM."
+  },
+  {
+    title: "04 - Nmap Fundamentals",
+    description: "Learn how to discover devices in your own lab.",
+    task: "Scan only your own authorized lab devices."
+  },
+  {
+    title: "05 - Wireshark Basics",
+    description: "Understand packets and network traffic.",
+    task: "Capture and inspect traffic in your lab."
+  }
+];
+
+const storageKey = "kali-studio-progress";
+
+function getProgress() {
+  try {
+    return JSON.parse(localStorage.getItem(storageKey)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveProgress(id, checked) {
+  const data = getProgress();
+  data[id] = checked;
+  localStorage.setItem(storageKey, JSON.stringify(data));
+  render();
+}
+
+function render() {
+  const data = getProgress();
+  const done = course.filter((_, i) => data[i]).length;
+
+  document.getElementById("progress").textContent =
+    Math.round(done / course.length * 100) + "%";
+
+  document.getElementById("completed").textContent =
+    done + " / " + course.length;
+
+  document.getElementById("lessons").innerHTML =
+    course.map((lesson, i) => `
+      <section class="lesson">
+        <h3>${lesson.title}</h3>
+        <p>${lesson.description}</p>
+        <p><b>Practical:</b> ${lesson.task}</p>
+        <label>
+          <input type="checkbox" ${data[i] ? "checked" : ""}
+            onchange="saveProgress(${i}, this.checked)">
+          Lesson completed
+        </label>
+      </section>
+    `).join("");
+}
+
+render();
+</script>
+</body>
+</html>
